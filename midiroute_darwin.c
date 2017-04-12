@@ -3,9 +3,9 @@
 
 #include <stdio.h>
 
-void darwinReceiveMidiByte(int byt);
+extern void darwinReceiveMidiByte(int byt);
 
-static void receiveMidiPackets(
+static void darwinReceiveMidiPackets(
 	const MIDIPacketList *pktlist, void *refCon, void *connRefCon)
 {
 	const MIDIPacket *packet;
@@ -22,7 +22,7 @@ static void receiveMidiPackets(
 	}
 }
 
-void darwinCoreLoop()
+extern void darwinCoreLoop(void)
 {
 	MIDIClientRef client;
 	MIDIPortRef inport;
@@ -31,7 +31,8 @@ void darwinCoreLoop()
 
 	MIDIClientCreate(CFSTR("MIDI Echo"), 0, 0, &client);
 	MIDIInputPortCreate(
-		client, CFSTR("Input port"), receiveMidiPackets, 0, &inport);
+		client, CFSTR("Input port"),
+		darwinReceiveMidiPackets, 0, &inport);
 	n = MIDIGetNumberOfSources();
 	fprintf(stderr, "Found %d MIDI source(s)\n", n);
 	for (i = 0; i < n; i++) {

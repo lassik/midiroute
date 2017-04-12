@@ -1,7 +1,7 @@
 package main
 
 // #cgo LDFLAGS: -framework Foundation -framework CoreMIDI
-// void darwinCoreLoop();
+// extern void darwinCoreLoop(void);
 import "C"
 
 //export darwinReceiveMidiByte
