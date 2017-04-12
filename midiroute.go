@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -17,7 +18,12 @@ func stringIter(ss []string, i int) func() (string, bool) {
 	}
 }
 
+var intoFormat = msgToMsg
+
 func setup() error {
+	if isTerminalFd(os.Stdout.Fd()) {
+		intoFormat = msgToDump
+	}
 	readArg := stringIter(os.Args, 1)
 	for arg, done := readArg(); !done; arg, done = readArg() {
 		switch arg {
@@ -28,6 +34,20 @@ func setup() error {
 	return nil
 }
 
+var msgBuf bytes.Buffer
+
+func flushMsgBuf() {
+	msg := msgBuf.Bytes()
+	msgBuf.Reset()
+	// TODO: Some formats may need to batch together multiple messages.
+	// Then we'll have to use channels instead of simple function calls.
+	msg = intoFormat(msg)
+	os.Stdout.Write(msg)
+}
+
 func receiveMidiByte(c byte) {
-	fmt.Printf("CORE got midi byte 0x%02x\n", c)
+	if isStatusByte(c) {
+		flushMsgBuf()
+	}
+	msgBuf.WriteByte(c)
 }
