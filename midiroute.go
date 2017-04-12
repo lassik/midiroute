@@ -18,19 +18,28 @@ func stringIter(ss []string, i int) func() (string, bool) {
 	}
 }
 
+var fromChan = make(chan []byte)
+var intoChan = make(chan []byte)
 var intoFormat = msgToMsg
 
 func setup() error {
 	if isTerminalFd(os.Stdout.Fd()) {
 		intoFormat = msgToDump
 	}
+	noArgsArray := [0]string{}
+	noArgs := noArgsArray[:]
+	var filter = identityFilter(noArgs)
 	readArg := stringIter(os.Args, 1)
 	for arg, done := readArg(); !done; arg, done = readArg() {
 		switch arg {
+		case "transpose":
+			filter = transposeFilter(noArgs)
 		default:
 			return errors.New(fmt.Sprintf("cannot figure out what you mean by %q", arg))
 		}
 	}
+	go filter(fromChan, intoChan)
+	go output()
 	return nil
 }
 
@@ -39,10 +48,15 @@ var msgBuf bytes.Buffer
 func flushMsgBuf() {
 	msg := msgBuf.Bytes()
 	msgBuf.Reset()
+	fromChan <- msg
+}
+
+func output() {
 	// TODO: Some formats may need to batch together multiple messages.
 	// Then we'll have to use channels instead of simple function calls.
-	msg = intoFormat(msg)
-	os.Stdout.Write(msg)
+	for msg := range intoChan {
+		os.Stdout.Write(intoFormat(msg))
+	}
 }
 
 func receiveMidiByte(c byte) {
