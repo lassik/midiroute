@@ -11,8 +11,8 @@ import (
 import "C"
 
 //export darwinReceiveMidiByte
-func darwinReceiveMidiByte(byt int) {
-	receiveMidiByte(byt)
+func darwinReceiveMidiByte(c byte) {
+	receiveMidiByte(c)
 }
 
 func isTerminalFd(fd uintptr) bool {

@@ -3,7 +3,8 @@
 
 #include <stdio.h>
 
-extern void darwinReceiveMidiByte(int byt);
+// TODO: Does 'int' correspond to Go's 'byte'?
+extern void darwinReceiveMidiByte(int c);
 
 static void darwinReceiveMidiPackets(
 	const MIDIPacketList *pktlist, void *refCon, void *connRefCon)

@@ -28,6 +28,6 @@ func setup() error {
 	return nil
 }
 
-func receiveMidiByte(byt int) {
-	fmt.Printf("CORE got midi byte 0x%02x\n", byt)
+func receiveMidiByte(c byte) {
+	fmt.Printf("CORE got midi byte 0x%02x\n", c)
 }
