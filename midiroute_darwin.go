@@ -7,11 +7,16 @@ import (
 
 // #cgo LDFLAGS: -framework Foundation -framework CoreMIDI
 // extern void darwinCoreLoop(void);
+// int isatty(int fd);
 import "C"
 
 //export darwinReceiveMidiByte
 func darwinReceiveMidiByte(byt int) {
 	receiveMidiByte(byt)
+}
+
+func isTerminalFd(fd uintptr) bool {
+	return C.isatty(C.int(fd)) != 0
 }
 
 func main() {
