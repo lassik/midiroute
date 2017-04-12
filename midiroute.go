@@ -7,17 +7,6 @@ import (
 	"os"
 )
 
-func stringIter(ss []string, i int) func() (string, bool) {
-	return func() (string, bool) {
-		if i < len(ss) {
-			i++
-			return ss[i-1], false
-		} else {
-			return "", true
-		}
-	}
-}
-
 var fromChan = make(chan []byte)
 var intoChan = make(chan []byte)
 var intoFormat = msgToMsg
